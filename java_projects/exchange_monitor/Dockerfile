@@ -14,8 +14,11 @@ RUN apk add --no-cache maven
 # 編譯應用程式
 RUN mvn clean package -DskipTests
 
-# 複製配置文件
-COPY src/main/resources/config.properties ./config.properties
+# 創建日誌目錄
+RUN mkdir -p /app/logs
+
+# 複製配置文件範例（如果不存在 config.properties）
+COPY src/main/resources/config.properties.example ./config.properties.example
 
 # 暴露JVM監控端口（可選）
 EXPOSE 8080
