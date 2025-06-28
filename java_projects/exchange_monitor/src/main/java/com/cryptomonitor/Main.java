@@ -37,6 +37,9 @@ public class Main {
             monitorManager.startMonitoring();
             logger.info("監控已啟動");
             
+            // 發送系統啟動通知
+            discordService.sendStartupNotification(exchangeManager.getExchangeCount(), appConfig.getExchangeConfigs().size());
+            
             // 添加關閉鉤子
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 logger.info("正在關閉系統...");

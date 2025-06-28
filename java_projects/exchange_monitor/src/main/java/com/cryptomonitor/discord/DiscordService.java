@@ -215,4 +215,34 @@ public class DiscordService {
             logger.error("使用Webhook發送嵌入消息失敗", e);
         }
     }
+    
+    /**
+     * 發送系統啟動通知
+     * @param enabledExchanges 已啟用的交易所數量
+     * @param totalExchanges 總交易所數量
+     */
+    public void sendStartupNotification(int enabledExchanges, int totalExchanges) {
+        try {
+            String title = "🚀 加密貨幣監控系統已上線";
+            String description = String.format(
+                "✅ **系統狀態**: 正常運行\n" +
+                "📊 **已啟用交易所**: %d/%d\n" +
+                "⏰ **啟動時間**: %s\n" +
+                "💡 **監控功能**: 價格變動 & 持倉量監控\n\n" +
+                "系統將開始監控各大交易所的市場數據變動。",
+                enabledExchanges, 
+                totalExchanges,
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        .format(Instant.now().atZone(ZoneId.systemDefault()))
+            );
+            
+            // 使用藍色表示系統啟動
+            Color color = new Color(0, 123, 255); // Bootstrap blue
+            
+            sendEmbed(title, description, color, Instant.now().getEpochSecond());
+            logger.info("已發送系統啟動通知");
+        } catch (Exception e) {
+            logger.error("發送系統啟動通知失敗", e);
+        }
+    }
 }

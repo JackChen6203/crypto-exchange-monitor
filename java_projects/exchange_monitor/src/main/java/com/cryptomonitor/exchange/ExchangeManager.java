@@ -24,6 +24,12 @@ public class ExchangeManager {
     public ExchangeManager(List<ExchangeConfig> exchangeConfigs) {
         for (ExchangeConfig config : exchangeConfigs) {
             try {
+                // 檢查 API 憑證是否有效
+                if (!config.isCredentialsValid()) {
+                    logger.warn("跳過交易所 {} - API 憑證無效或未設置", config.getName());
+                    continue;
+                }
+                
                 Exchange exchange = createExchange(config);
                 if (exchange != null) {
                     exchanges.put(config.getName().toLowerCase(), exchange);
@@ -33,6 +39,8 @@ public class ExchangeManager {
                 logger.error("創建交易所失敗: " + config.getName(), e);
             }
         }
+        
+        logger.info("交易所管理器初始化完成，共啟用 {} 個交易所", exchanges.size());
     }
     
     /**
