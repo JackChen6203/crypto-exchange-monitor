@@ -1,0 +1,184 @@
+name: 🚀 自動部署到生產環境
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    name: 🧪 執行測試
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 取得原始碼
+      uses: actions/checkout@v4
+    
+    - name: ☕ 設定 JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: 📦 Maven 快取
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    
+    - name: 🔧 執行測試
+      run: mvn clean test
+    
+    - name: 📊 上傳測試報告
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: target/surefire-reports/
+
+  build:
+    name: 🏗️ 建置應用程式
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 取得原始碼
+      uses: actions/checkout@v4
+    
+    - name: ☕ 設定 JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: 📦 Maven 快取
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    
+    - name: 🔨 建置應用程式
+      run: mvn clean package -DskipTests
+    
+    - name: 📦 上傳建置檔案
+      uses: actions/upload-artifact@v3
+      with:
+        name: jar-artifact
+        path: target/*.jar
+
+  deploy-railway:
+    name: 🚂 部署到 Railway
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 取得原始碼
+      uses: actions/checkout@v4
+    
+    - name: 🚂 部署到 Railway
+      uses: railwayapp/railway-deploy@v1
+      with:
+        railway_token: ${{ secrets.RAILWAY_TOKEN }}
+        service: crypto-exchange-monitor
+    
+    - name: 📢 部署成功通知
+      if: success()
+      run: |
+        echo "✅ 部署成功！"
+        echo "🔗 應用程式已部署到 Railway"
+
+  deploy-render:
+    name: 🎨 部署到 Render
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 取得原始碼
+      uses: actions/checkout@v4
+    
+    - name: 🐳 設定 Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: 🔐 登入 Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: 🏗️ 建置並推送 Docker 映像
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/crypto-exchange-monitor:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: 🎨 觸發 Render 部署
+      run: |
+        curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+    
+    - name: 📢 部署成功通知
+      if: success()
+      run: |
+        echo "✅ 部署成功！"
+        echo "🔗 應用程式已部署到 Render"
+
+  security-scan:
+    name: 🔒 安全性掃描
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: 📥 取得原始碼
+      uses: actions/checkout@v4
+    
+    - name: ☕ 設定 JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: 🔍 OWASP 依賴性檢查
+      run: |
+        mvn org.owasp:dependency-check-maven:check
+    
+    - name: 📊 上傳安全性報告
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-report
+        path: target/dependency-check-report.html
+
+  notify:
+    name: 📢 通知結果
+    runs-on: ubuntu-latest
+    needs: [test, build, deploy-railway, deploy-render, security-scan]
+    if: always()
+    
+    steps:
+    - name: 📢 Discord 通知
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      with:
+        args: |
+          🚀 **部署狀態更新**
+          📦 **專案**: 加密貨幣監控系統
+          🌿 **分支**: ${{ github.ref_name }}
+          👤 **提交者**: ${{ github.actor }}
+          📝 **提交訊息**: ${{ github.event.head_commit.message }}
+          
+          ✅ **測試**: ${{ needs.test.result }}
+          🏗️ **建置**: ${{ needs.build.result }}
+          🚂 **Railway部署**: ${{ needs.deploy-railway.result }}
+          🎨 **Render部署**: ${{ needs.deploy-render.result }}
+          🔒 **安全性掃描**: ${{ needs.security-scan.result }}
+          
+          🔗 **查看詳情**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} 

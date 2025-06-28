@@ -1,0 +1,84 @@
+# ===========================================
+# 加密貨幣交易所監控系統配置檔案範例
+# ===========================================
+
+# Discord配置 (二選一)
+# ==================
+# 方式1: 使用Discord Bot Token
+discord.token=YOUR_DISCORD_BOT_TOKEN_HERE
+discord.channel_id=YOUR_DISCORD_CHANNEL_ID_HERE
+
+# 方式2: 使用Discord Webhook URL
+# discord.webhook_url=YOUR_DISCORD_WEBHOOK_URL_HERE
+
+# 監控設定
+# ==================
+# 監控間隔時間(秒)
+monitor.interval_seconds=60
+
+# 價格變動閾值(百分比)
+monitor.price_threshold_percent=1.0
+
+# 持倉量變動閾值(百分比)
+monitor.position_threshold_percent=5.0
+
+# 監控的交易對(用逗號分隔)
+monitor.symbols=BTCUSDT,ETHUSDT,SOLUSDT
+
+# 交易所啟用設定
+# ==================
+exchange.binance.enabled=true
+exchange.bybit.enabled=true
+exchange.bitget.enabled=true
+exchange.okx.enabled=true
+exchange.hyperliquid.enabled=true
+
+# 幣安交易所配置
+# ==================
+binance.api_key=YOUR_BINANCE_API_KEY_HERE
+binance.api_secret=YOUR_BINANCE_API_SECRET_HERE
+binance.base_url=https://fapi.binance.com
+binance.ws_url=wss://fstream.binance.com/ws
+
+# Bybit交易所配置
+# ==================
+bybit.api_key=YOUR_BYBIT_API_KEY_HERE
+bybit.api_secret=YOUR_BYBIT_API_SECRET_HERE
+bybit.base_url=https://api.bybit.com
+bybit.ws_url=wss://stream.bybit.com/v5/public/linear
+
+# Bitget交易所配置
+# ==================
+bitget.api_key=YOUR_BITGET_API_KEY_HERE
+bitget.api_secret=YOUR_BITGET_API_SECRET_HERE
+bitget.passphrase=YOUR_BITGET_PASSPHRASE_HERE
+bitget.base_url=https://api.bitget.com
+bitget.ws_url=wss://ws.bitget.com/mix/v1/stream
+
+# OKX交易所配置
+# ==================
+okx.api_key=YOUR_OKX_API_KEY_HERE
+okx.api_secret=YOUR_OKX_API_SECRET_HERE
+okx.passphrase=YOUR_OKX_PASSPHRASE_HERE
+okx.base_url=https://www.okx.com
+okx.ws_url=wss://ws.okx.com:8443/ws/v5/public
+
+# Hyperliquid交易所配置
+# ==================
+hyperliquid.api_key=YOUR_HYPERLIQUID_API_KEY_HERE
+hyperliquid.api_secret=YOUR_HYPERLIQUID_API_SECRET_HERE
+hyperliquid.base_url=https://api.hyperliquid.xyz
+hyperliquid.ws_url=wss://api.hyperliquid.xyz/ws
+
+# 應用程式設定
+# ==================
+app.name=CryptoExchangeMonitor
+app.version=1.0.0
+app.timezone=Asia/Taipei
+
+# 日誌設定
+# ==================
+log.level=INFO
+log.file=logs/crypto-monitor.log
+log.max_size=10MB
+log.max_files=5 
