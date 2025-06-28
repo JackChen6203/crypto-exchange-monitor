@@ -1,128 +1,214 @@
-# 加密貨幣交易所監控系統
+# 🚀 加密貨幣交易所監控系統
 
-## 項目概述
+一個全面的加密貨幣交易所數據監控系統，支援多個主流交易所的價格和持倉量監控，並通過 Discord 發送即時警報。
 
-這是一個用Java開發的加密貨幣交易所監控系統，能夠實時監控多個主要交易所（幣安、Bybit、Bitget、OKX、Hyperliquid）的持倉量和價格變動，並將異常波動通過Discord通知用戶。
+## ✨ 核心功能
 
-## 功能特點
+- 📊 **多交易所支援**: Binance、Bybit、Bitget、OKX、Hyperliquid
+- 🔔 **Discord 通知**: 支援 Bot Token 和 Webhook 兩種模式
+- ⚡ **即時監控**: 價格變動和持倉量異動警報
+- 🔧 **智能管理**: 自動跳過未配置 API 的交易所
+- 🐳 **Docker 部署**: 一鍵部署，支援多平台
+- 📱 **上線通知**: 系統啟動時自動發送 Discord 通知
 
-- 支持多個主要交易所的API和WebSocket連接
-- 監控交易對的價格變動
-- 監控交易對的持倉量變動（多空持倉）
-- 可配置的異常波動閾值
-- Discord通知（支持Bot和Webhook兩種模式）
-- 自動重連和錯誤處理機制
-- 詳細的日誌記錄
+## 🚀 快速開始
 
-## 系統需求
-
-- Java 11或更高版本
-- Maven 3.6或更高版本
-- 網絡連接以訪問交易所API
-- Discord Bot Token或Webhook URL
-
-## 快速開始
-
-### 1. 配置
-
-編輯`src/main/resources/config.properties`文件，設置以下參數：
-
-- Discord配置（Token或Webhook URL）
-- 交易所API密鑰和密碼
-- 監控參數（間隔時間、價格和持倉量變動閾值）
-
-### 2. 編譯
+### 1. 克隆專案
 
 ```bash
-mvn clean package
+git clone <repository-url>
+cd exchange_monitor
 ```
 
-### 3. 運行
+### 2. 配置系統
+
+**📖 詳細配置請參考**: [**CONFIG_GUIDE.md**](CONFIG_GUIDE.md)
 
 ```bash
-java -jar target/crypto-monitor-1.0-SNAPSHOT-jar-with-dependencies.jar
+# 複製配置文件
+cp config.properties.example config.properties
+
+# 編輯配置文件，設置 Discord 和交易所 API
+nano config.properties
 ```
 
-## 配置說明
+### 3. 啟動系統
 
-### Discord配置
+```bash
+# Docker 部署
+docker-compose up -d
+
+# 或使用快速部署腳本
+./quick-deploy.ps1 -Platform docker    # Windows
+./quick-start.sh                       # Linux/Mac
+```
+
+### 4. 驗證運行
+
+```bash
+# 查看日誌
+docker-compose logs -f
+
+# 檢查容器狀態
+docker-compose ps
+```
+
+## 📋 系統要求
+
+- Docker & Docker Compose
+- 至少一個交易所的 API 憑證（僅需讀取權限）
+- Discord Bot Token 或 Webhook URL
+
+## 🔧 配置說明
+
+### Discord 設置（二選一）
+
+#### 方法一：Webhook（推薦）
+```properties
+discord.webhook_url=https://discord.com/api/webhooks/YOUR_WEBHOOK_URL
+```
+
+#### 方法二：Bot Token
+```properties
+discord.token=YOUR_BOT_TOKEN
+discord.channel_id=YOUR_CHANNEL_ID
+```
+
+### 交易所 API 設置
 
 ```properties
-# 使用Discord Bot
-discord.token=YOUR_DISCORD_BOT_TOKEN
-discord.channel_id=YOUR_DISCORD_CHANNEL_ID
+# 僅需要讀取權限的 API Key
+binance.api_key=YOUR_BINANCE_API_KEY
+binance.api_secret=YOUR_BINANCE_SECRET_KEY
 
-# 或使用Discord Webhook
-discord.webhook_url=YOUR_DISCORD_WEBHOOK_URL
+bybit.api_key=YOUR_BYBIT_API_KEY
+bybit.api_secret=YOUR_BYBIT_SECRET_KEY
+# ... 其他交易所
 ```
 
-### 監控配置
+**⚠️ 安全提醒**: API Key 僅需要讀取權限，切勿開啟交易權限！
+
+## 📊 監控參數
 
 ```properties
 # 監控間隔（秒）
 monitor.interval_seconds=60
 
-# 價格變動閾值（百分比）
+# 價格變動閾值（%）
 monitor.price_threshold_percent=1.0
 
-# 持倉量變動閾值（百分比）
+# 持倉量變動閾值（%）
 monitor.position_threshold_percent=5.0
+
+# 監控交易對
+monitor.symbols=BTCUSDT,ETHUSDT,SOLUSDT
 ```
 
-### 交易所配置
+## 🎯 功能特色
 
-每個交易所都需要配置API密鑰、密碼和URL：
+### 智能交易所管理
+- ✅ 自動檢查 API 憑證有效性
+- ⏭️ 跳過未配置或無效的交易所
+- 📝 清晰的日誌輸出
 
-```properties
-# 幣安配置示例
-binance.api_key=YOUR_BINANCE_API_KEY
-binance.api_secret=YOUR_BINANCE_API_SECRET
-binance.base_url=https://fapi.binance.com
-binance.ws_url=wss://fstream.binance.com/ws
+### 多樣化通知
+- 🎨 美觀的 Discord Embed 消息
+- 🚀 系統啟動通知
+- 📈 價格異動警報
+- 📊 持倉量變動警報
+
+### 容器化部署
+- 🐳 Docker 支援
+- 🔄 自動重啟
+- 📋 健康檢查
+- 📊 資源限制
+
+## 📂 專案結構
+
+```
+exchange_monitor/
+├── src/main/java/com/cryptomonitor/
+│   ├── Main.java                    # 應用程式入口
+│   ├── config/                      # 配置管理
+│   ├── discord/                     # Discord 服務
+│   ├── exchange/                    # 交易所抽象層
+│   │   └── impl/                    # 交易所實現
+│   ├── monitor/                     # 監控管理
+│   └── model/                       # 數據模型
+├── docker-compose.yml              # Docker 編排
+├── Dockerfile                      # Docker 鏡像
+├── config.properties               # 主配置文件
+├── CONFIG_GUIDE.md                 # 詳細配置指南
+└── quick-deploy.ps1                # 快速部署腳本
 ```
 
-## 項目結構
+## 🔍 日誌示例
 
 ```
-src/main/java/com/cryptomonitor/
-├── Main.java                    # 程序入口
-├── config/                      # 配置類
-│   ├── AppConfig.java           # 應用配置
-│   ├── DiscordConfig.java       # Discord配置
-│   ├── ExchangeConfig.java      # 交易所配置
-│   └── MonitorConfig.java       # 監控配置
-├── discord/                     # Discord相關
-│   └── DiscordService.java      # Discord服務
-├── exchange/                    # 交易所相關
-│   ├── Exchange.java            # 交易所接口
-│   ├── AbstractExchange.java    # 交易所抽象類
-│   ├── ExchangeManager.java     # 交易所管理器
-│   └── impl/                    # 交易所實現
-│       ├── BinanceExchange.java # 幣安實現
-│       ├── BybitExchange.java   # Bybit實現
-│       ├── BitgetExchange.java  # Bitget實現
-│       ├── OKXExchange.java     # OKX實現
-│       └── HyperliquidExchange.java # Hyperliquid實現
-├── model/                       # 數據模型
-│   └── MarketData.java          # 市場數據
-└── monitor/                     # 監控相關
-    └── MonitorManager.java      # 監控管理器
+✅ 已創建交易所: Binance
+✅ 已創建交易所: Bybit
+✅ 交易所管理器初始化完成，共啟用 2 個交易所
+✅ Discord服務初始化完成
+✅ 已發送系統啟動通知
+✅ 監控已啟動，間隔時間: 60秒
 ```
 
-## 擴展支持
+## 🛠️ 開發指南
 
-如需添加新的交易所支持，請按照以下步驟：
+### 本地開發
 
-1. 在`config.properties`中添加新交易所的配置
-2. 在`exchange/impl/`目錄下創建新的交易所實現類，繼承`AbstractExchange`
-3. 在`ExchangeManager.java`中添加新交易所的初始化代碼
+```bash
+# 編譯專案
+mvn clean package
 
-## 日誌
+# 運行測試
+mvn test
 
-日誌文件保存在`logs/`目錄下：
-- `crypto-monitor.log`: 一般日誌
-- `error.log`: 錯誤日誌
+# 啟動應用
+java -jar target/crypto-exchange-monitor-*-jar-with-dependencies.jar
+```
 
-## 許可證
+### 添加新交易所
 
-MIT
+1. 在 `exchange/impl/` 中實現 `Exchange` 接口
+2. 在 `ExchangeManager` 中註冊新交易所
+3. 添加相應的配置項
+
+## 🐛 故障排除
+
+### 常見問題
+
+- **Discord 無法發送**: 檢查 Webhook URL 或 Bot 權限
+- **交易所連接失敗**: 驗證 API 憑證和權限
+- **監控無反應**: 確認至少配置一個有效交易所
+
+### 檢查日誌
+
+```bash
+# 即時日誌
+docker-compose logs -f
+
+# 查看錯誤
+docker-compose logs | grep ERROR
+```
+
+## 🤝 貢獻指南
+
+1. Fork 專案
+2. 創建功能分支
+3. 提交變更
+4. 創建 Pull Request
+
+## 📄 授權條款
+
+MIT License - 詳見 [LICENSE](LICENSE) 文件
+
+## 📞 技術支援
+
+- 📖 **詳細配置**: [CONFIG_GUIDE.md](CONFIG_GUIDE.md)
+- 🐛 **問題回報**: GitHub Issues
+- 📧 **技術討論**: GitHub Discussions
+
+---
+
+⭐ 如果這個專案對你有幫助，請給個 Star！
