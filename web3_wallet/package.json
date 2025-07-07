@@ -1,0 +1,45 @@
+{
+  "name": "bitcoin-calculator-infinite-hunter",
+  "version": "1.0.0",
+  "description": "🚀 Bitcoin Calculator - 無限獵人版：12個API負載平衡的Bitcoin地址生成器",
+  "main": "test/infinite-bitcoin-hunter.js",
+  "scripts": {
+    "hunt:infinite": "node test/infinite-bitcoin-hunter.js",
+    "hunt:bitcoin": "node test/infinite-bitcoin-hunter.js",
+    "test:balance:advanced": "node test/advanced-balance-test.js --basic 100",
+    "test:balance:large": "node test/advanced-balance-test.js --large 1000",
+    "test:balance:mixed": "node test/advanced-balance-test.js --mixed 100 100",
+    "test:balance:stress": "node test/advanced-balance-test.js --stress 60",
+    "test:turbo": "node test/turbo-wallet-generator.js",
+    "test:turbo:fast": "node test/turbo-wallet-generator.js --no-balance"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0",
+    "axios": "^1.5.0",
+    "bitcoinjs-lib": "^5.2.0",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.8.0"
+  },
+  "keywords": [
+    "bitcoin",
+    "wallet",
+    "generator",
+    "balance",
+    "checker",
+    "api",
+    "loadbalancing",
+    "cryptocurrency",
+    "infinite",
+    "hunter"
+  ],
+  "author": "Bitcoin Hunter Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JackChen6203/bitcoin_calculator-.git"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
