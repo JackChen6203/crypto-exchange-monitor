@@ -384,19 +384,19 @@ class BitgetContractMonitor {
     const tableRows = sortedData.map((item, index) => {
       const symbol = item.symbol.padEnd(10);
       const current = this.formatNumber(item.current).padStart(8);
-      const change15m = (item.changes['15m'] || 0).toFixed(2).padStart(6) + '%';
-      const change1h = (item.changes['1h'] || 0).toFixed(2).padStart(6) + '%';
-      const change4h = (item.changes['4h'] || 0).toFixed(2).padStart(6) + '%';
-      const change1d = (item.changes['1d'] || 0).toFixed(2).padStart(6) + '%';
+      const change15m = this.formatChangePercent(item.changes['15m'] || 0).padStart(7);
+      const change1h = this.formatChangePercent(item.changes['1h'] || 0).padStart(7);
+      const change4h = this.formatChangePercent(item.changes['4h'] || 0).padStart(7);
+      const change1d = this.formatChangePercent(item.changes['1d'] || 0).padStart(7);
       
       return `${(index + 1).toString().padStart(2)} | ${symbol} | ${current} | ${change15m} | ${change1h} | ${change4h} | ${change1d}`;
     }).join('\n');
 
     const tableContent = `\`\`\`
-📈 持倉量增長排行 TOP15 (多時間週期對比)
+📈 持倉量增長排行 TOP15 (多時間週期漲幅對比)
 
-排名 | 交易對      | 當前持倉   | 15分   | 1時    | 4時    | 日線
------|-----------|----------|--------|--------|--------|--------
+排名 | 交易對      | 當前持倉   | 15分    | 1時     | 4時     | 日線
+-----|-----------|----------|---------|---------|---------|--------
 ${tableRows}
 \`\`\``;
 
@@ -434,19 +434,19 @@ ${tableRows}
     const tableRows = sortedData.map((item, index) => {
       const symbol = item.symbol.padEnd(10);
       const current = this.formatNumber(item.current).padStart(8);
-      const change15m = (item.changes['15m'] || 0).toFixed(2).padStart(6) + '%';
-      const change1h = (item.changes['1h'] || 0).toFixed(2).padStart(6) + '%';
-      const change4h = (item.changes['4h'] || 0).toFixed(2).padStart(6) + '%';
-      const change1d = (item.changes['1d'] || 0).toFixed(2).padStart(6) + '%';
+      const change15m = this.formatChangePercent(item.changes['15m'] || 0).padStart(7);
+      const change1h = this.formatChangePercent(item.changes['1h'] || 0).padStart(7);
+      const change4h = this.formatChangePercent(item.changes['4h'] || 0).padStart(7);
+      const change1d = this.formatChangePercent(item.changes['1d'] || 0).padStart(7);
       
       return `${(index + 1).toString().padStart(2)} | ${symbol} | ${current} | ${change15m} | ${change1h} | ${change4h} | ${change1d}`;
     }).join('\n');
 
     const tableContent = `\`\`\`
-📉 持倉量減少排行 TOP15 (多時間週期對比)
+📉 持倉量減少排行 TOP15 (多時間週期跌幅對比)
 
-排名 | 交易對      | 當前持倉   | 15分   | 1時    | 4時    | 日線
------|-----------|----------|--------|--------|--------|--------
+排名 | 交易對      | 當前持倉   | 15分    | 1時     | 4時     | 日線
+-----|-----------|----------|---------|---------|---------|--------
 ${tableRows}
 \`\`\``;
 
@@ -501,6 +501,14 @@ ${combinedRows.join('\n')}
       return (num / 1e3).toFixed(2) + 'K';
     }
     return num.toFixed(2);
+  }
+
+  formatChangePercent(changePercent) {
+    if (changePercent === 0) {
+      return '0.00%';
+    }
+    const sign = changePercent > 0 ? '+' : '';
+    return `${sign}${changePercent.toFixed(2)}%`;
   }
 
   stop() {
