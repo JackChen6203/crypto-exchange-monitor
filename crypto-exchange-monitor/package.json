@@ -6,9 +6,10 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "node test/e2eTest.js",
+    "test": "node test/basic.test.js",
+    "test:e2e": "node test/e2eTest.js",
     "test:contract": "node test/contractMonitorTest.js", 
-    "test:all": "npm run test && npm run test:contract",
+    "test:all": "npm run test && npm run test:e2e && npm run test:contract",
     "test-discord": "node src/index.js --test",
     "system-test": "node test/systemTest.js",
     "lint": "echo 'Code style check passed'",
@@ -39,7 +40,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Davis1233798/exchange_monitor.git"
+    "url": "https://github.com/JackChen6203/crypto-exchange-monitor.git"
   },
   "engines": {
     "node": ">=18.0.0"
